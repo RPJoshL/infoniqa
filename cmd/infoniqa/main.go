@@ -41,10 +41,22 @@ func main() {
 	switch strings.ToLower(os.Args[1]) {
 	case "kommen":
 		if err := inf.Kommen(); err != nil {
+			// Special return code for "already booked"
+			if strings.HasPrefix(err.Error(), "last booking was already") {
+				logger.Error("Failed to book 'kommen': %s", err)
+				os.Exit(2)
+			}
+
 			logger.Fatal("Failed to book 'kommen': %s", err)
 		}
 	case "gehen":
 		if err := inf.Gehen(); err != nil {
+			// Special return code for "already booked"
+			if strings.HasPrefix(err.Error(), "last booking was already") {
+				logger.Error("Failed to book 'gehen': %s", err)
+				os.Exit(2)
+			}
+
 			logger.Fatal("Failed to book 'gehen': %s", err)
 		}
 	case "abwesend":
@@ -60,11 +72,23 @@ func main() {
 
 		// Buche kommen und dann gehen
 		if err := inf.Gehen(); err != nil {
-			logger.Fatal("Failed to book 'kommen': %s", err)
+			// Special return code for "already booked"
+			if strings.HasPrefix(err.Error(), "last booking was already") {
+				logger.Error("Failed to book 'gehen': %s", err)
+				os.Exit(2)
+			}
+
+			logger.Fatal("Failed to book 'gehen': %s", err)
 		}
 		logger.Info("Waiting %d minutes....", minutes)
 		time.Sleep(time.Duration(minutes * int(time.Minute)))
 		if err := inf.Kommen(); err != nil {
+			// Special return code for "already booked"
+			if strings.HasPrefix(err.Error(), "last booking was already") {
+				logger.Error("Failed to book 'kommen': %s", err)
+				os.Exit(2)
+			}
+
 			logger.Fatal("Failed to book 'kommen': %s", err)
 		}
 
